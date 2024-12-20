@@ -8,8 +8,7 @@ class MedicalShopInventory:
     def __init__(self, root):
         self.root = root
         self.root.title("Medical Shop Inventory System")
-
-        # Make the window size fixed
+        
         self.root.minsize(800, 600)
 
         # Initialize database
@@ -19,23 +18,23 @@ class MedicalShopInventory:
         # Create main frames
         self.create_frames()
 
-        # Create widgets
+        #widgets
         self.create_inventory_widgets()
         self.create_sales_widgets()
 
-        # Set up periodic stock check
+        #stock check
         self.check_low_stock()
 
         # Handle app closing
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         
     def view_stock(self):
-    # Create a new window to display the stock
+    #new window to display the stock
         stock_window = tk.Toplevel(self.root)
         stock_window.title("Current Stock")
         stock_window.geometry("500x400")
     
-    # Create a Treeview widget to display the stock
+    # Treeview widget to display the stock
         columns = ("Medicine Name", "Quantity", "Last Updated")
         tree = ttk.Treeview(stock_window, columns=columns, show="headings")
         tree.heading("Medicine Name", text="Medicine Name")
@@ -52,17 +51,17 @@ class MedicalShopInventory:
         for row in rows:
             tree.insert("", tk.END, values=row)
     
-    # Add a scrollbar
+    #scrollbar
         scrollbar = ttk.Scrollbar(stock_window, orient="vertical", command=tree.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         tree.configure(yscrollcommand=scrollbar.set)
     def view_sales(self):
-    # Create a new window to display the sales report
+    # new window to display the sales report
         sales_window = tk.Toplevel(self.root)
         sales_window.title("Sales Report")
         sales_window.geometry("600x400")
     
-    # Create a Treeview widget to display sales
+    #Treeview widget to display sales
         columns = ("Medicine Name", "Quantity Sold", "Sale Date")
         tree = ttk.Treeview(sales_window, columns=columns, show="headings")
         tree.heading("Medicine Name", text="Medicine Name")
@@ -81,14 +80,14 @@ class MedicalShopInventory:
             sale_date = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S.%f').strftime('%d-%m-%Y %H:%M')
             tree.insert("", tk.END, values=(row[0], row[1], sale_date))
     
-    # Add a scrollbar
+    #scrollbar
         scrollbar = ttk.Scrollbar(sales_window, orient="vertical", command=tree.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         tree.configure(yscrollcommand=scrollbar.set)
     
     def create_tables(self):
         cursor = self.conn.cursor()
-        # Create inventory table
+        # inventory table
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS inventory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,7 +96,7 @@ class MedicalShopInventory:
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         ''')
-        # Create sales table
+        #sales table
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS sales (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,7 +108,7 @@ class MedicalShopInventory:
         self.conn.commit()
 
     def create_frames(self):
-        # Configure grid weights
+        # grid weights
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
 
@@ -125,7 +124,7 @@ class MedicalShopInventory:
         self.warning_frame = ttk.LabelFrame(self.root, text="Low Stock Warnings")
         self.warning_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="nsew")
 
-        # Create warning label
+        # warning label
         self.warning_label = ttk.Label(self.warning_frame, text="", foreground="red")
         self.warning_label.pack(padx=5, pady=5)
 
@@ -188,7 +187,6 @@ class MedicalShopInventory:
         ttk.Button(button_frame, text="Record Sale", command=self.record_sale).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View Sales Report", command=self.view_sales).pack(side=tk.LEFT, padx=5)
 
-        # Initial update of medicine list
         self.update_medicine_list()
 
     def update_medicine_list(self):
@@ -288,13 +286,13 @@ class MedicalShopInventory:
             return
 
         try:
-        # Record the sale in the sales table
+        # Record the sale 
             cursor.execute('''
                 INSERT INTO sales (medicine_name, quantity_sold, sale_date)
                 VALUES (?, ?, ?)
             ''', (medicine_name, quantity_sold, datetime.now()))
 
-        # Update the inventory to reflect the sold quantity
+        # Update the inventory
             cursor.execute('''
                 UPDATE inventory
                 SET quantity = quantity - ?, last_updated = ?
@@ -305,11 +303,11 @@ class MedicalShopInventory:
 
             messagebox.showinfo("Success", "Sale recorded successfully!")
 
-        # Refresh the selected medicine stock and clear input
+        # Refresh the selected medicine stock
             self.on_medicine_select()
             self.sale_quantity.delete(0, tk.END)
 
-        # Check for low stock after the sale
+        # low stock after the sale
             self.check_low_stock()
 
         except sqlite3.Error as e:
