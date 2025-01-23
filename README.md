@@ -39,10 +39,9 @@ Ensure you have the following installed on your system:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/medical-inventory-management.git
-cd medical-inventory-management
+git clone (https://github.com/Lokesh1028/Medicine-inventory.git)
+cd Medicine-inventory
 
-python medical_inventory.py
-
+python Medicine-inventory.py
 
 
